@@ -11,44 +11,60 @@ export function initCinematicAnimations() {
     const showcaseCenter = document.getElementById("showcase-center");
     const showcaseRight = document.getElementById("showcase-right");
 
+    // --- Smooth Scroll State ---
+    let targetScroll = window.scrollY;
+    let currentScroll = window.scrollY;
+    let scrollRafId;
+
     const onScroll = () => {
-        const scrollTop = window.scrollY;
-        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        targetScroll = window.scrollY;
+    };
+    // Passive listener for maximum scroll performance
+    window.addEventListener("scroll", onScroll, { passive: true });
 
-        if (progressBar) progressBar.style.width = `${progress}%`;
+    const smoothScrollLoop = () => {
+        // Lerp (Linear Interpolation) for buttery smoothness
+        currentScroll += (targetScroll - currentScroll) * 0.08;
 
-        if (scrollTop > 50) {
-            navbar?.classList.add("scrolled");
-        } else {
-            navbar?.classList.remove("scrolled");
+        // Stop calculating if difference is microscopic to save CPU
+        if (Math.abs(targetScroll - currentScroll) > 0.1) {
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = scrollHeight > 0 ? (currentScroll / scrollHeight) : 0;
+
+            if (progressBar) progressBar.style.transform = `scaleX(${progress})`;
+
+            if (currentScroll > 50) {
+                navbar?.classList.add("scrolled");
+            } else {
+                navbar?.classList.remove("scrolled");
+            }
+
+            // Hero 3D Rotation based on smooth scroll
+            if (heroMockup && currentScroll < window.innerHeight + 200) {
+                const rotateX = Math.max(0, 15 - currentScroll * 0.05);
+                const rotateY = -15 + currentScroll * 0.05;
+                const translateZ = currentScroll * 0.2;
+                heroMockup.style.transform = `translate3d(0,0,0) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(${translateZ}px)`;
+            }
+
+            // Showcase Scroll Overlapping Parallax - Optimized
+            const showcaseSection = document.getElementById("showcase-section");
+            if (showcaseSection) {
+                const rect = showcaseSection.getBoundingClientRect();
+                const distance = rect.top + (targetScroll - currentScroll) + rect.height / 2 - window.innerHeight / 2;
+                const parallaxFactor = distance * 0.08;
+
+                if (showcaseLeft) showcaseLeft.style.transform = `translate3d(0, ${parallaxFactor * 1.5}px, 0) rotateY(15deg)`;
+                if (showcaseCenter) showcaseCenter.style.transform = `translate3d(0, ${parallaxFactor * -0.5}px, 50px)`;
+                if (showcaseRight) showcaseRight.style.transform = `translate3d(0, ${parallaxFactor * 1.5}px, 0) rotateY(-15deg)`;
+            }
         }
 
-        // Hero 3D Rotation based on scroll
-        if (heroMockup && scrollTop < window.innerHeight) {
-            const rotateX = Math.max(0, 15 - scrollTop * 0.05);
-            const rotateY = -15 + scrollTop * 0.05;
-            const translateZ = scrollTop * 0.2;
-            heroMockup.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(${translateZ}px)`;
-        }
-
-        // Showcase Scroll Overlapping Parallax
-        const showcaseSection = document.getElementById("showcase-section");
-        if (showcaseSection) {
-            const rect = showcaseSection.getBoundingClientRect();
-            const viewportMid = window.innerHeight / 2;
-
-            // Calculate how far the center of the section is from the center of the viewport
-            const distance = rect.top + rect.height / 2 - viewportMid;
-            const parallaxFactor = distance * 0.1;
-
-            if (showcaseLeft) showcaseLeft.style.transform = `translateY(${parallaxFactor * 1.5}px) rotateY(15deg)`;
-            if (showcaseCenter) showcaseCenter.style.transform = `translateY(${parallaxFactor * -0.5}px) translateZ(50px)`;
-            if (showcaseRight) showcaseRight.style.transform = `translateY(${parallaxFactor * 1.5}px) rotateY(-15deg)`;
-        }
+        scrollRafId = requestAnimationFrame(smoothScrollLoop);
     };
 
-    window.addEventListener("scroll", onScroll);
+    // Start the smooth scroll loop
+    smoothScrollLoop();
 
     // --- Intersection Observers for Cinematic Reveals ---
     const observerOptions = {
@@ -83,6 +99,7 @@ export function initCinematicAnimations() {
     let particlesArray = [];
     let _w = window.innerWidth;
     let _h = window.innerHeight;
+    let isCanvasVisible = true;
 
     class Particle {
         constructor(w, h) {
@@ -118,14 +135,30 @@ export function initCinematicAnimations() {
         canvas.width = _w;
         canvas.height = _h;
         particlesArray = [];
-        const count = window.innerWidth < 768 ? 50 : 150;
+        // Reduce particles on low-end devices
+        const count = window.innerWidth < 768 ? 40 : 120;
         for (let i = 0; i < count; i++) {
             particlesArray.push(new Particle(_w, _h));
         }
     };
 
+    // Pause canvas when off-screen
+    if (canvas) {
+        const canvasObserver = new IntersectionObserver((entries) => {
+            isCanvasVisible = entries[0].isIntersecting;
+        }, { threshold: 0 });
+        canvasObserver.observe(canvas);
+    }
+
     const animateCanvas = () => {
         if (!canvas) return;
+
+        // Skip rendering if canvas is off-screen
+        if (!isCanvasVisible) {
+            animationFrameId = requestAnimationFrame(animateCanvas);
+            return;
+        }
+
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, _w, _h);
 
@@ -155,5 +188,6 @@ export function initCinematicAnimations() {
         if (canvas) window.removeEventListener('resize', initCanvas);
         revealObserver.disconnect();
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        if (scrollRafId) cancelAnimationFrame(scrollRafId);
     };
 }

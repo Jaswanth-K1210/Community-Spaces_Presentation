@@ -19,7 +19,7 @@ export default function App() {
       <nav className="navbar" id="navbar">
         <div className="nav-container">
           <div className="logo">
-            <Grid size={24} /> CommunitySpaces
+            <img src="/assets/app-logo.png" alt="CommunitySpaces" className="logo-icon" /> CommunitySpaces
           </div>
           <button className="cta-btn">Partner With Us</button>
         </div>
@@ -40,8 +40,7 @@ export default function App() {
             Exhibition Management
           </h1>
           <p className="hero-subtitle cinematic-reveal" style={{ transitionDelay: '0.2s' }}>
-            Smarter Infrastructure for Modern Event Organisers.<br />
-            Apple-level polish with Stripe-grade reliability.
+            Smarter Infrastructure for Modern Event Organisers.
           </p>
 
           <div className="perspective-1000 cinematic-reveal" style={{ transitionDelay: '0.4s' }}>
@@ -124,7 +123,7 @@ export default function App() {
 
             {/* Right — phone mockup */}
             <div className="problem-right cinematic-reveal" style={{ transitionDelay: '0.3s' }}>
-              <div style={{ width: '240px', height: '480px' }}>
+              <div style={{ width: '240px', height: '533px' }}>
                 <div className="modern-phone" style={{ borderRadius: '36px', border: '7px solid #1a1a1a' }}>
                   <div className="screen-content" style={{ backgroundImage: "url('/assets/events-home.png')" }}></div>
                 </div>
