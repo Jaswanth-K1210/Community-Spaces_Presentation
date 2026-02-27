@@ -21,7 +21,7 @@ export default function App() {
           <div className="logo">
             <img src="/assets/app-logo.png" alt="CommunitySpaces" className="logo-icon" /> CommunitySpaces
           </div>
-          <button className="cta-btn">Partner With Us</button>
+          <a href="https://www.communityspaces.in/" target="_blank" rel="noopener noreferrer" className="cta-btn">Partner With Us</a>
         </div>
         <div className="scroll-progress-container">
           <div className="scroll-progress" id="scroll-progress"></div>
@@ -217,9 +217,9 @@ export default function App() {
             <span style={{ color: 'rgba(248,250,252,0.45)' }}>Operate with Confidence.</span>
           </h2>
           <div className="cinematic-reveal" style={{ transitionDelay: '0.2s' }}>
-            <button className="cta-btn" style={{ padding: '1.2rem 3rem', fontSize: '1.1rem' }}>
+            <a href="https://www.communityspaces.in/" target="_blank" rel="noopener noreferrer" className="cta-btn" style={{ padding: '1.2rem 3rem', fontSize: '1.1rem' }}>
               Partner with CommunitySpaces
-            </button>
+            </a>
           </div>
         </div>
       </section>
