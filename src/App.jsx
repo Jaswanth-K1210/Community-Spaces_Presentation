@@ -195,7 +195,7 @@ export default function App() {
 
           <div className="showcase-grid cinematic-reveal" style={{ transitionDelay: '0.3s' }}>
             <div className="modern-phone showcase-mockup left" id="showcase-left">
-              <div className="screen-content" style={{ backgroundImage: "url('/assets/events-home.png')" }}></div>
+              <div className="screen-content" style={{ backgroundImage: "url('/assets/event-detail.png')" }}></div>
             </div>
             <div className="modern-phone showcase-mockup center" id="showcase-center">
               <div className="screen-content" style={{ backgroundImage: "url('/assets/stall-layout.png')" }}></div>
